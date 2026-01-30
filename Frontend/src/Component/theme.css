@@ -1,0 +1,35 @@
+:root {
+  /* ===== BACKGROUND ===== */
+  --bg-gradient-start: #020617;   /* very dark navy */
+  --bg-gradient-mid: #052e2b;     /* dark green-teal */
+  --bg-gradient-end: #020617;
+
+  --bg-card: rgba(6, 78, 59, 0.45); /* dark green glass */
+  --bg-input: #064e3b;             /* emerald-900 */
+  --bg-disabled: #020617;
+
+  /* ===== BORDER ===== */
+  --border-main: #065f46;   /* emerald-800 */
+  --border-input: #047857; /* emerald-700 */
+
+  /* ===== TEXT ===== */
+  --text-main: #ecfdf5;        /* emerald-50 */
+  --text-muted: #9ca3af;       /* neutral gray */
+  --text-placeholder: #6b7280; /* gray-500 */
+  --text-label: #a7f3d0;       /* emerald-200 */
+
+  /* ===== BRAND COLORS ===== */
+  --accent-primary: #22c55e;   /* green-500 */
+  --accent-secondary: #14b8a6; /* teal-500 */
+
+  /* ===== STATUS ===== */
+  --success: #22c55e; /* green */
+  --danger: #ef4444;  /* red */
+
+  /* ===== UI ===== */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --shadow-card: 0 20px 40px rgba(0, 0, 0, 0.55);
+}
