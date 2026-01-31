@@ -1,7 +1,5 @@
-import axios  from "axios";
+import api from "../api/api";
 export const fetchMe = async () => {
-  const res = await axios.get("http://localhost:3001/api/auth/me", {
-    withCredentials: true,
-  });
+  const res=await api.get("/auth/me");
   return res.data.user;
 };

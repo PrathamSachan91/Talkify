@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/api";
 
 import { MessageCircle } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -23,11 +23,7 @@ function Login() {
   const handleSubmit = async (e) => {
   e.preventDefault();
   try {
-    await axios.post(
-      "http://localhost:3001/api/auth/login",
-      values,
-      { withCredentials: true }
-    );
+    api.post("/auth/login", values);
 
     await queryClient.invalidateQueries({ queryKey: ["me"] });
     showAlert("Login successful", "success");

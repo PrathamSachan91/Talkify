@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/api";
 import { MessageCircle } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -26,11 +26,7 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(
-        "http://localhost:3001/api/auth/signin",
-        values,
-        {withCredentials:true}
-      );
+      api.post("/auth/signin", values);
       await queryClient.invalidateQueries({queryKey: ["me"]});
       showAlert("Account created successfully", "success");
       setTimeout(() => navigate("/"), 800);

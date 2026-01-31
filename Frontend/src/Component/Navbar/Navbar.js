@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../redux/AuthSlice";
-import axios from "axios";
+import api from "../api/api";
 import {useQueryClient } from "@tanstack/react-query";
 
 const Navbar = () => {
@@ -10,11 +10,7 @@ const Navbar = () => {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const queryClient=useQueryClient();
   const handleLogout =async () => {
-    await axios.post(
-      "http://localhost:3001/api/auth/logout",
-      {},
-      { withCredentials: true }
-    )
+    api.get("/auth/logout");
     dispatch(logout());
     queryClient.clear();
     navigate("/login");
