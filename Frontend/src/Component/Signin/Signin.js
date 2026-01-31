@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { MessageCircle } from "lucide-react";
-import { useDispatch } from "react-redux";
-import { setUser } from "../redux/AuthSlice";
+import { useQueryClient } from "@tanstack/react-query";
 
 function Signup() {
   const [values, setValues] = useState({
@@ -11,8 +10,7 @@ function Signup() {
     email: "",
     password: "",
   });
-  const dispatch=useDispatch();
-
+  const queryClient=useQueryClient();
   const [alert, setAlert] = useState({ msg: "", type: "" });
   const navigate = useNavigate();
 
@@ -28,11 +26,12 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(
+      await axios.post(
         "http://localhost:3001/api/auth/signin",
-        values
+        values,
+        {withCredentials:true}
       );
-      dispatch(setUser({user:res.data.user}));
+      await queryClient.invalidateQueries({queryKey: ["me"]});
       showAlert("Account created successfully", "success");
       setTimeout(() => navigate("/"), 800);
     } catch (err) {

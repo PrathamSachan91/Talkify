@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import routes from "./routes/route.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -13,7 +14,7 @@ app.use(
     credentials: true,
   })
 );
-
+app.use(cookieParser());
 app.use(express.json());
 app.use("/api", routes);
 

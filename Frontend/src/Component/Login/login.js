@@ -1,17 +1,16 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useDispatch } from "react-redux";
-import { setUser } from "../redux/AuthSlice";
+
 import { MessageCircle } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 function Login() {
   const [values, setValues] = useState({ email: "", password: "" });
   const [alert, setAlert] = useState({ msg: "", type: "" });
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const queryClient=useQueryClient();
   const showAlert = (msg, type) => {
     setAlert({ msg, type });
     setTimeout(() => setAlert({ msg: "", type: "" }), 1500);
@@ -22,20 +21,22 @@ function Login() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post(
-        "http://localhost:3001/api/auth/login",
-        values
-      );
-      dispatch(setUser({user:res.data.user}));
-      showAlert("Login successful", "success");
+  e.preventDefault();
+  try {
+    await axios.post(
+      "http://localhost:3001/api/auth/login",
+      values,
+      { withCredentials: true }
+    );
 
-      setTimeout(() => navigate("/"), 600);
-    } catch (err) {
-      showAlert(err.response?.data?.message || "Login failed", "error");
-    }
-  };
+    await queryClient.invalidateQueries({ queryKey: ["me"] });
+    showAlert("Login successful", "success");
+    navigate("/");
+  } catch (err) {
+    showAlert(err.response?.data?.message || "Login failed", "error");
+  }
+};
+
 
   return (
     <div
@@ -70,7 +71,7 @@ function Login() {
           </h2>
 
           <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-            Sign in to continue to Talkify
+            Log in to continue to Talkify
           </p>
         </div>
 
@@ -158,7 +159,7 @@ function Login() {
               color: "#020617",
             }}
           >
-            Sign In
+            Log In
           </button>
         </form>
 
@@ -192,7 +193,7 @@ function Login() {
             to="/Signin"
             style={{ color: "var(--accent-secondary)" }}
           >
-            Sign up
+            Sign in
           </Link>
         </p>
       </div>
