@@ -2,6 +2,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import Authentication from "../models/Authentication.js";
 import AuthToken from "../models/token.js";
+import crypto from "crypto";
+
+const hashToken = (token) =>
+  crypto.createHash("sha256").update(token).digest("hex");
 
 /* ---------------- SIGNUP ---------------- */
 export const Signin = async (req, res) => {
@@ -28,15 +32,13 @@ export const Signin = async (req, res) => {
       last_active: new Date(),
     });
 
-    const token = jwt.sign(
-      { auth_id: user.auth_id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = jwt.sign({ auth_id: user.auth_id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     await AuthToken.create({
       auth_id: user.auth_id,
-      token,
+      token: hashToken(token),
       expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
 
@@ -81,15 +83,17 @@ export const Login = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign(
-      { auth_id: user.auth_id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = jwt.sign({ auth_id: user.auth_id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+    
+    await AuthToken.destroy({
+      where: { auth_id: user.auth_id },
+    });
 
     await AuthToken.create({
       auth_id: user.auth_id,
-      token,
+      token: hashToken(token),
       expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
 
@@ -119,4 +123,20 @@ export const Login = async (req, res) => {
 /* ---------------- GET CURRENT USER ---------------- */
 export const getUser = async (req, res) => {
   res.json({ user: req.user });
+};
+
+export const Logout = async (req, res) => {
+  const token = req.cookies?.access_token;
+
+  if (token) {
+    const tokenHash = hashToken(token);
+    await AuthToken.destroy({ where: { token: tokenHash } });
+  }
+
+  res.clearCookie("access_token", {
+    httpOnly: true,
+    sameSite: "lax",
+  });
+
+  res.json({ message: "Logged out successfully" });
 };

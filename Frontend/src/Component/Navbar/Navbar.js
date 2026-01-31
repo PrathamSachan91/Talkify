@@ -1,17 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../redux/AuthSlice";
+import axios from "axios";
+import {useQueryClient } from "@tanstack/react-query";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-//   const authState = useSelector((state) => state.auth);
-// console.log("Auth",authState);
-  // 🔐 Read auth state from Redux
   const { user, isAuthenticated } = useSelector((state) => state.auth);
-
-  const handleLogout = () => {
+  const queryClient=useQueryClient();
+  const handleLogout =async () => {
+    await axios.post(
+      "http://localhost:3001/api/auth/logout",
+      {},
+      { withCredentials: true }
+    )
     dispatch(logout());
+    queryClient.clear();
     navigate("/login");
   };
 
