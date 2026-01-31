@@ -25,10 +25,10 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/auth/register", values);
+      await axios.post("http://localhost:3001/api/auth/signin", values);
 
       showAlert("Account created successfully", "success");
-      setTimeout(() => navigate("/login"), 800);
+      setTimeout(() => navigate("/"), 800);
     } catch (err) {
       showAlert(err.response?.data?.message || "Signup failed", "error");
     }

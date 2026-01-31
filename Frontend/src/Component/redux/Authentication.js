@@ -2,7 +2,6 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   user: null,            // logged-in user object
-  token: null,           // JWT token (optional but recommended)
   isAuthenticated: false,
   loading: false,
 };
@@ -14,7 +13,6 @@ const authSlice = createSlice({
     // 🔐 Login success
     setUser: (state, action) => {
       state.user = action.payload.user;
-      state.token = action.payload.token;
       state.isAuthenticated = true;
       state.loading = false;
     },
@@ -22,7 +20,6 @@ const authSlice = createSlice({
     // 🚪 Logout
     logout: (state) => {
       state.user = null;
-      state.token = null;
       state.isAuthenticated = false;
       state.loading = false;
     },

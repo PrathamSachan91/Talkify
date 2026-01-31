@@ -1,16 +1,16 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../config/db.js";
+import sequelize from "../lib/db.js";
 
 const Authentication = sequelize.define(
   "Authentication",
   {
-    id: {
+    auth_id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
 
-    username: {
+    user_name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -25,9 +25,19 @@ const Authentication = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    last_active: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    }
   },
   {
-    tableName: "Authentication",
+    tableName: "authentication",
     freezeTableName: true,
     timestamps: false,
   },
