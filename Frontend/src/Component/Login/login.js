@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { setUser } from "../redux/Authentication";
+import { setUser } from "../redux/AuthSlice";
 import { MessageCircle } from "lucide-react";
 
 function Login() {
@@ -25,11 +25,10 @@ function Login() {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        "http://localhost:3001/api/auth/login",
         values
       );
-
-      dispatch(setUser(res.data.user));
+      dispatch(setUser({user:res.data.user}));
       showAlert("Login successful", "success");
 
       setTimeout(() => navigate("/"), 600);
