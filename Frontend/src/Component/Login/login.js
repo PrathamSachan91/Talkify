@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api";
-
+import {GoogleLogin} from "@react-oauth/google"
 import { MessageCircle } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -21,17 +21,29 @@ function Login() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    api.post("/auth/login", values);
+    e.preventDefault();
+    try {
+      await api.post("/auth/login", values);
 
-    await queryClient.invalidateQueries({ queryKey: ["me"] });
-    showAlert("Login successful", "success");
-    navigate("/");
-  } catch (err) {
-    showAlert(err.response?.data?.message || "Login failed", "error");
-  }
-};
+      await queryClient.invalidateQueries({ queryKey: ["me"] });
+      showAlert("Login successful", "success");
+      navigate("/");
+    } catch (err) {
+      showAlert(err.response?.data?.message || "Login failed", "error");
+    }
+  };
+  const handleGoogleLogin =async(credentialResponse)=> {
+    try{
+      await api.post("/auth/google",
+        {credential:credentialResponse.credential},
+      );
+      showAlert("Google login successful","success");
+      queryClient.invalidateQueries({ queryKey: ["me"] });
+      setTimeout(() => navigate("/"), 600);
+    }catch(err){
+      showAlert(err.response?.data?.message || "Google login failed", "error");
+    }
+  };
 
 
   return (
@@ -65,7 +77,6 @@ function Login() {
           >
             Welcome back
           </h2>
-
           <p className="text-sm" style={{ color: "var(--text-muted)" }}>
             Log in to continue to Talkify
           </p>
@@ -168,16 +179,9 @@ function Login() {
           <div className="flex-1 h-px bg-gray-600/40" />
         </div>
 
-        {/* Google Login Placeholder */}
-        <button
-          className="w-full py-2 rounded-md border text-sm transition"
-          style={{
-            borderColor: "var(--border-main)",
-            color: "var(--text-main)",
-          }}
-        >
-          Continue with Google
-        </button>
+        <div className="wt-6">
+              <GoogleLogin onSuccess={handleGoogleLogin} />
+        </div>
 
         {/* Signup */}
         <p
@@ -198,3 +202,4 @@ function Login() {
 }
 
 export default Login;
+
