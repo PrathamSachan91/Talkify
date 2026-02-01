@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMe } from "../Tanstack/Credential";
-import Footer from "../Footer/Footer"
+import Footer from "../Footer/Footer";
 import Navbar from "../Navbar/Navbar";
 import SideBar from "../Sidebar/Sidebar";
 import { setUser, logout } from "../redux/AuthSlice";
@@ -28,8 +28,11 @@ function Static() {
 
   if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        Loading...
+      <div className="h-screen flex flex-col items-center justify-center gap-4">
+        <div className="loader" />
+        <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+          Loading your workspace...
+        </p>
       </div>
     );
   }
