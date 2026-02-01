@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api";
-import {GoogleLogin} from "@react-oauth/google"
+import { GoogleLogin } from "@react-oauth/google";
 import { MessageCircle } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -10,7 +10,7 @@ function Login() {
   const [alert, setAlert] = useState({ msg: "", type: "" });
 
   const navigate = useNavigate();
-  const queryClient=useQueryClient();
+  const queryClient = useQueryClient();
   const showAlert = (msg, type) => {
     setAlert({ msg, type });
     setTimeout(() => setAlert({ msg: "", type: "" }), 1500);
@@ -32,19 +32,18 @@ function Login() {
       showAlert(err.response?.data?.message || "Login failed", "error");
     }
   };
-  const handleGoogleLogin =async(credentialResponse)=> {
-    try{
-      await api.post("/auth/google",
-        {credential:credentialResponse.credential},
-      );
-      showAlert("Google login successful","success");
+  const handleGoogleLogin = async (credentialResponse) => {
+    try {
+      await api.post("/auth/google", {
+        credential: credentialResponse.credential,
+      });
+      showAlert("Google login successful", "success");
       queryClient.invalidateQueries({ queryKey: ["me"] });
       setTimeout(() => navigate("/"), 600);
-    }catch(err){
+    } catch (err) {
       showAlert(err.response?.data?.message || "Google login failed", "error");
     }
   };
-
 
   return (
     <div
@@ -62,6 +61,18 @@ function Login() {
           boxShadow: "var(--shadow-card)",
         }}
       >
+        <div className="flex justify-start mb-2">
+          <button
+            onClick={() => navigate("/")}
+            className="text-sm font-medium px-3 py-1 rounded-md transition"
+            style={{
+              color: "var(--accent-secondary)",
+              border: "1px solid var(--border-main)",
+            }}
+          >
+            ← Back
+          </button>
+        </div>
         {/* Header */}
         <div className="flex flex-col items-center mb-6">
           <div
@@ -92,9 +103,7 @@ function Login() {
                   ? "rgba(34,197,94,0.15)"
                   : "rgba(239,68,68,0.15)",
               color:
-                alert.type === "success"
-                  ? "var(--success)"
-                  : "var(--danger)",
+                alert.type === "success" ? "var(--success)" : "var(--danger)",
             }}
           >
             {alert.msg}
@@ -179,8 +188,17 @@ function Login() {
           <div className="flex-1 h-px bg-gray-600/40" />
         </div>
 
-        <div className="wt-6">
-              <GoogleLogin onSuccess={handleGoogleLogin} />
+        <div className="flex justify-center">
+          <div className="w-half">
+            <GoogleLogin
+              onSuccess={handleGoogleLogin}
+              width="50%"
+              theme="outline"
+              size="large"
+              shape="rectangular"
+              text="continue_with"
+            />
+          </div>
         </div>
 
         {/* Signup */}
@@ -189,10 +207,7 @@ function Login() {
           style={{ color: "var(--text-muted)" }}
         >
           Don’t have an account?{" "}
-          <Link
-            to="/Signin"
-            style={{ color: "var(--accent-secondary)" }}
-          >
+          <Link to="/Signin" style={{ color: "var(--accent-secondary)" }}>
             Sign in
           </Link>
         </p>
@@ -202,4 +217,3 @@ function Login() {
 }
 
 export default Login;
-

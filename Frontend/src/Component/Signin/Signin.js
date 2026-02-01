@@ -10,7 +10,7 @@ function Signup() {
     email: "",
     password: "",
   });
-  const queryClient=useQueryClient();
+  const queryClient = useQueryClient();
   const [alert, setAlert] = useState({ msg: "", type: "" });
   const navigate = useNavigate();
 
@@ -26,8 +26,8 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      api.post("/auth/signin", values);
-      await queryClient.invalidateQueries({queryKey: ["me"]});
+      await api.post("/auth/signin", values);
+      await queryClient.invalidateQueries({ queryKey: ["me"] });
       showAlert("Account created successfully", "success");
       setTimeout(() => navigate("/"), 800);
     } catch (err) {
@@ -51,6 +51,18 @@ function Signup() {
           boxShadow: "var(--shadow-card)",
         }}
       >
+        <div className="flex justify-start mb-2">
+          <button
+            onClick={() => navigate("/")}
+            className="text-sm font-medium px-3 py-1 rounded-md transition"
+            style={{
+              color: "var(--accent-secondary)",
+              border: "1px solid var(--border-main)",
+            }}
+          >
+            ← Back
+          </button>
+        </div>
         {/* Header */}
         <div className="flex flex-col items-center mb-6">
           <div
@@ -82,9 +94,7 @@ function Signup() {
                   ? "rgba(34,197,94,0.15)"
                   : "rgba(239,68,68,0.15)",
               color:
-                alert.type === "success"
-                  ? "var(--success)"
-                  : "var(--danger)",
+                alert.type === "success" ? "var(--success)" : "var(--danger)",
             }}
           >
             {alert.msg}
@@ -166,16 +176,21 @@ function Signup() {
           </div>
 
           {/* Submit */}
-          <button
-            type="submit"
-            className="w-full py-2 rounded-md font-medium transition"
-            style={{
-              backgroundColor: "var(--accent-primary)",
-              color: "#020617",
-            }}
-          >
-            Sign Up
-          </button>
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              className="w-full py-2 rounded-md font-medium transition-all duration-300 ease-out
+               hover:-translate-y-0.5 hover:shadow-lg
+               active:translate-y-0 active:scale-95"
+              style={{
+                backgroundColor: "var(--accent-primary)",
+                color: "#020617",
+                boxShadow: "0 0 0 rgba(0,0,0,0)",
+              }}
+            >
+              Sign In
+            </button>
+          </div>
         </form>
 
         {/* Login link */}
@@ -184,11 +199,8 @@ function Signup() {
           style={{ color: "var(--text-muted)" }}
         >
           Already have an account?{" "}
-          <Link
-            to="/login"
-            style={{ color: "var(--accent-secondary)" }}
-          >
-            Sign in
+          <Link to="/login" style={{ color: "var(--accent-secondary)" }}>
+            Log in
           </Link>
         </p>
       </div>
