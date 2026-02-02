@@ -1,5 +1,6 @@
 import { Op } from "sequelize";
 import { Conversation, Message, Authentication } from "../models/index.js";
+import { getIO } from "../socket.js"; // adjust path if needed
 
 /* ---------------- GET OR CREATE CONVERSATION ---------------- */
 export const getOrCreateConversation = async (req, res) => {
@@ -64,16 +65,17 @@ export const getMessages = async (req, res) => {
 };
 
 /* ---------------- SEND MESSAGE ---------------- */
+
 export const sendMessage = async (req, res) => {
   try {
     const { conversationId, text } = req.body;
     const me = req.user.auth_id;
-    const cleanText = text?.trim();
 
     if (!conversationId) {
       return res.status(400).json({ message: "Conversation ID required" });
     }
 
+    const cleanText = text?.trim();
     if (!cleanText) {
       return res.status(400).json({ message: "Message cannot be empty" });
     }
@@ -95,12 +97,23 @@ export const sendMessage = async (req, res) => {
       text: cleanText,
     });
 
-    res.json(message);
+    /* 🔥 Emit via socket */
+    const io = getIO();
+    io.to(`conversation-${conversationId}`).emit("receive_message", {
+      id: message.id,
+      conversation_id: message.conversation_id,
+      sender_id: message.sender_id,
+      text: message.text,
+      createdAt: message.createdAt,
+    });
+
+    res.status(201).json(message);
   } catch (err) {
     console.error("Send message error:", err);
     res.status(500).json({ message: "Failed to send message" });
   }
 };
+
 /* ---------------- GET CONVERSATION META ---------------- */
 export const getConversationMeta = async (req, res) => {
   try {
@@ -132,8 +145,6 @@ export const getConversationMeta = async (req, res) => {
     res.status(500).json({ message: "Failed to load conversation" });
   }
 };
-
-
 
 export const getUserById = async (req, res) => {
   const user = await Authentication.findByPk(req.params.userId, {

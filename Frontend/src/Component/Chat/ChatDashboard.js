@@ -1,43 +1,67 @@
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
-import { useState, useEffect, useRef } from "react";
-import {fetchMessages,sendMessage,fetchConversationMeta,fetchUserById} from "../Tanstack/Chatlist";
+import { useEffect, useRef, useState } from "react";
+
+import {
+  fetchMessages,
+  sendMessage,
+  fetchConversationMeta,
+  fetchUserById,
+} from "../Tanstack/Chatlist";
+
+import socket from "../../socket";
 
 const ChatDashboard = () => {
   const { conversationId } = useParams();
   const currentUser = useSelector((state) => state.auth.user);
   const queryClient = useQueryClient();
+
   const [text, setText] = useState("");
   const bottomRef = useRef(null);
 
-  /* 🔹 Conversation meta */
   const { data: convo } = useQuery({
     queryKey: ["conversation-meta", conversationId],
     queryFn: () => fetchConversationMeta(conversationId),
     enabled: !!conversationId,
   });
 
-  /* 🔹 Receiver user */
   const { data: receiver } = useQuery({
     queryKey: ["user", convo?.receiver_id],
     queryFn: () => fetchUserById(convo.receiver_id),
     enabled: !!convo?.receiver_id,
   });
 
-  /* 🔹 Messages */
   const { data: messages = [], isLoading } = useQuery({
     queryKey: ["messages", conversationId],
     queryFn: () => fetchMessages(conversationId),
     enabled: !!conversationId,
   });
 
+  useEffect(() => {
+    if (!conversationId) return;
+
+    socket.emit("join_conversation", conversationId);
+
+    socket.on("receive_message", (message) => {
+      queryClient.setQueryData(
+        ["messages", conversationId],
+        (old = []) => {
+          // prevent duplicates
+          if (old.some((m) => m.id === message.id)) return old;
+          return [...old, message];
+        }
+      );
+    });
+
+    return () => {
+      socket.off("receive_message");
+    };
+  }, [conversationId, queryClient]);
+
   const sendMessageMutation = useMutation({
     mutationFn: sendMessage,
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["messages", conversationId],
-      });
       setText("");
     },
   });
@@ -56,7 +80,7 @@ const ChatDashboard = () => {
 
   return (
     <div className="flex-1 flex flex-col">
-      {/* HEADER */}
+      {/* ================= HEADER ================= */}
       <div
         className="px-4 py-3 border-b font-semibold flex items-center gap-3"
         style={{
@@ -78,7 +102,7 @@ const ChatDashboard = () => {
         <span>{receiver?.user_name || "Chat"}</span>
       </div>
 
-      {/* MESSAGES */}
+      {/* ================= MESSAGES ================= */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.length === 0 ? (
           <p
@@ -112,12 +136,16 @@ const ChatDashboard = () => {
         <div ref={bottomRef} />
       </div>
 
-      {/* INPUT */}
+      {/* ================= INPUT ================= */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           if (!text.trim()) return;
-          sendMessageMutation.mutate({ conversationId, text });
+
+          sendMessageMutation.mutate({
+            conversationId,
+            text,
+          });
         }}
         className="p-3 border-t flex gap-2"
         style={{
