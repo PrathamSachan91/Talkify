@@ -1,59 +1,54 @@
-import { useParams } from "react-router-dom";
-
-/* Dummy users (same as sidebar for now) */
-const usersMap = {
-  11: "Priyanshu",
-  12: "Pratham",
-  3: "Rahul",
-  4: "Sneha",
-};
-
-/* Dummy chats */
-const dummyChats = {
-  11: [
-    { from: "them", text: "Hey 👋" },
-    { from: "me", text: "Hi! How are you?" },
-    { from: "them", text: "All good 😊" },
-  ],
-  12: [
-    { from: "them", text: "Did you check the update?" },
-    { from: "me", text: "Yes, looks good!" },
-  ],
-  3: [
-    { from: "them", text: "Meeting at 6?" },
-    { from: "me", text: "Sure 👍" },
-  ],
-};
+import { useParams} from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import { useState, useEffect, useRef } from "react";
+import { fetchMessages, sendMessage } from "../Tanstack/Chatlist";
 
 const ChatDashboard = () => {
-  const { userId } = useParams();
-  const userName = usersMap[userId] || "User";
-  const messages = dummyChats[userId] || [];
+  const { conversationId } = useParams();
+  const currentUser = useSelector((state) => state.auth.user);
+  const queryClient = useQueryClient();
+  const [text, setText] = useState("");
+  const bottomRef = useRef(null);
+  const { data: messages = [], isLoading } = useQuery({
+    queryKey: ["messages", conversationId],
+    queryFn: () => fetchMessages(conversationId),
+    enabled: !!conversationId,
+  });
+
+  const sendMessageMutation = useMutation({
+    mutationFn: sendMessage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey:["messages", conversationId]});
+      setText("");
+    },
+  });
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <span style={{ color: "var(--text-muted)" }}>Loading chat…</span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col">
-      {/* Header */}
       <div
-        className="px-4 py-3 border-b font-semibold flex items-center gap-3"
+        className="px-4 py-3 border-b font-semibold"
         style={{
           borderColor: "var(--border-main)",
-          color: "var(--text-main)",
           backgroundColor: "var(--bg-card)",
+          color: "var(--text-main)",
         }}
       >
-        <div
-          className="w-9 h-9 rounded-full flex items-center justify-center font-semibold"
-          style={{
-            backgroundColor: "var(--accent-secondary)",
-            color: "#020617",
-          }}
-        >
-          {userName.charAt(0)}
-        </div>
-        <span>Chat with {userName}</span>
+        Conversation #{conversationId}
       </div>
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.length === 0 ? (
           <p
@@ -63,49 +58,66 @@ const ChatDashboard = () => {
             No messages yet. Say hello 👋
           </p>
         ) : (
-          messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`max-w-xs px-4 py-2 rounded-lg text-sm transition-all duration-300 ${
-                msg.from === "me" ? "ml-auto" : "mr-auto"
-              }`}
-              style={{
-                backgroundColor:
-                  msg.from === "me"
+          messages.map((msg) => {
+            const isMe = msg.sender_id === currentUser?.auth_id;
+
+            return (
+              <div
+                key={msg.id}
+                className={`max-w-xs px-4 py-2 rounded-lg text-sm ${
+                  isMe ? "ml-auto" : "mr-auto"
+                }`}
+                style={{
+                  backgroundColor: isMe
                     ? "var(--accent-primary)"
                     : "var(--bg-input)",
-                color:
-                  msg.from === "me"
-                    ? "#020617"
-                    : "var(--text-main)",
-              }}
-            >
-              {msg.text}
-            </div>
-          ))
+                  color: isMe ? "#020617" : "var(--text-main)",
+                }}
+              >
+                {msg.text}
+              </div>
+            );
+          })
         )}
+        <div ref={bottomRef} />
       </div>
 
-      {/* Input (disabled for now) */}
-      <div
-        className="p-3 border-t"
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!text.trim()) return;
+          sendMessageMutation.mutate({ conversationId, text });
+        }}
+        className="p-3 border-t flex gap-2"
         style={{
           borderColor: "var(--border-main)",
           backgroundColor: "var(--bg-card)",
         }}
       >
         <input
-          type="text"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           placeholder="Type a message..."
-          className="w-full px-4 py-2 rounded-md outline-none"
+          className="flex-1 px-4 py-2 rounded-md outline-none"
           style={{
             backgroundColor: "var(--bg-input)",
             color: "var(--text-main)",
             border: "1px solid var(--border-input)",
           }}
-          disabled
         />
-      </div>
+
+        <button
+          type="submit"
+          disabled={sendMessageMutation.isLoading}
+          className="px-4 py-2 rounded-md font-medium"
+          style={{
+            backgroundColor: "var(--accent-primary)",
+            color: "#020617",
+          }}
+        >
+          Send
+        </button>
+      </form>
     </div>
   );
 };

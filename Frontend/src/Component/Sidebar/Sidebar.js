@@ -1,16 +1,37 @@
 import { useSelector } from "react-redux";
-import { useQuery } from "@tanstack/react-query";
-import { fetchUsers } from "../Tanstack/Chatlist";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { fetchUsers, getConversation } from "../Tanstack/Chatlist";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const SideBar = () => {
   const currentUser = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
+  const [openingUserId, setOpeningUserId] = useState(null);
 
   const { data: users = [], isLoading } = useQuery({
     queryKey: ["users"],
     queryFn: fetchUsers,
   });
-  const navigate = useNavigate();
+
+  const openChatMutation = useMutation({
+    mutationFn: getConversation,
+    onSuccess: (convo) => {
+      navigate(`/chat/${convo.conversation_id}`);
+      setOpeningUserId(null);
+    },
+    onError: () => {
+      setOpeningUserId(null);
+      alert("Failed to open chat");
+    },
+  });
+
+  const openChat = (userId) => {
+    if (openingUserId) return;
+    setOpeningUserId(userId);
+    openChatMutation.mutate(userId);
+  };
+
   if (isLoading) {
     return (
       <aside className="w-64 h-full flex items-center justify-center">
@@ -20,7 +41,7 @@ const SideBar = () => {
   }
 
   const filteredUsers = users.filter(
-    (user) => user.auth_id !== currentUser?.auth_id,
+    (u) => u.auth_id !== currentUser?.auth_id
   );
 
   return (
@@ -31,7 +52,6 @@ const SideBar = () => {
         borderColor: "var(--border-main)",
       }}
     >
-      {/* Header */}
       <div
         className="px-4 py-3 font-semibold border-b"
         style={{
@@ -42,14 +62,16 @@ const SideBar = () => {
         Conversations
       </div>
 
-      {/* Users */}
       <ul className="overflow-y-auto">
         {filteredUsers.map((user) => (
           <li
             key={user.auth_id}
             className="px-4 py-3 flex items-center gap-3 cursor-pointer transition"
-            style={{ color: "var(--text-main)" }}
-            onClick={() => navigate(`/chat/${user.auth_id}`)}
+            style={{
+              color: "var(--text-main)",
+              opacity: openingUserId === user.auth_id ? 0.6 : 1,
+            }}
+            onClick={() => openChat(user.auth_id)}
             onMouseEnter={(e) =>
               (e.currentTarget.style.backgroundColor =
                 "rgba(20, 184, 166, 0.15)")
@@ -58,20 +80,14 @@ const SideBar = () => {
               (e.currentTarget.style.backgroundColor = "transparent")
             }
           >
-            {/* Avatar */}
-            <div className="relative">
-              <div
-                className="w-9 h-9 rounded-full flex items-center justify-center font-semibold"
-                style={{
-                  backgroundColor: "var(--accent-secondary)",
-                  color: "#020617",
-                }}
-              >
-                {user.user_name.charAt(0)}
-              </div>
-
-              {/* Online indicator (later via sockets) */}
-              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-gray-500 border border-black"></span>
+            <div
+              className="w-9 h-9 rounded-full flex items-center justify-center font-semibold"
+              style={{
+                backgroundColor: "var(--accent-secondary)",
+                color: "#020617",
+              }}
+            >
+              {user.user_name.charAt(0)}
             </div>
 
             <span className="text-sm">{user.user_name}</span>

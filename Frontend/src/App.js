@@ -20,7 +20,7 @@ function App() {
         <Route path='/Signin' element={<Signin />} />
         <Route element= {<Static/>}>
           <Route path="/" element={<Landing />} />
-          <Route path="/chat/:userId" element={<ChatDashboard />} />
+          <Route path="/chat/:conversationId" element={<ChatDashboard />} />
          
         </Route>
       </Routes>
