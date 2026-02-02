@@ -2,7 +2,7 @@ import express from "express";
 import { Signin, Login,getUser,Logout,googleLogin } from "../Controller/Authentication.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
 import { getAllUsers } from "../Controller/Chatlist.js";
-import { getMessages, getOrCreateConversation, sendMessage } from "../Controller/ChatControl.js";
+import { getMessages, getOrCreateConversation, sendMessage,getConversationMeta,getUserById } from "../Controller/ChatControl.js";
 
 const router = express.Router();
 
@@ -15,4 +15,7 @@ router.get("/ChatList",requireAuth,getAllUsers);
 router.post("/chat/conversation",requireAuth,getOrCreateConversation);
 router.get("/chat/messages/:conversationId",requireAuth,getMessages);
 router.post("/chat/message",requireAuth,sendMessage);
+router.get("/user/:userId", requireAuth, getUserById);
+router.get("/chat/conversation/:conversationId", requireAuth,getConversationMeta);
+
 export default router;

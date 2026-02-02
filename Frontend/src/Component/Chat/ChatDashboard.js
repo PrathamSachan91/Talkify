@@ -1,8 +1,8 @@
-import { useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { useState, useEffect, useRef } from "react";
-import { fetchMessages, sendMessage } from "../Tanstack/Chatlist";
+import {fetchMessages,sendMessage,fetchConversationMeta,fetchUserById} from "../Tanstack/Chatlist";
 
 const ChatDashboard = () => {
   const { conversationId } = useParams();
@@ -10,6 +10,22 @@ const ChatDashboard = () => {
   const queryClient = useQueryClient();
   const [text, setText] = useState("");
   const bottomRef = useRef(null);
+
+  /* 🔹 Conversation meta */
+  const { data: convo } = useQuery({
+    queryKey: ["conversation-meta", conversationId],
+    queryFn: () => fetchConversationMeta(conversationId),
+    enabled: !!conversationId,
+  });
+
+  /* 🔹 Receiver user */
+  const { data: receiver } = useQuery({
+    queryKey: ["user", convo?.receiver_id],
+    queryFn: () => fetchUserById(convo.receiver_id),
+    enabled: !!convo?.receiver_id,
+  });
+
+  /* 🔹 Messages */
   const { data: messages = [], isLoading } = useQuery({
     queryKey: ["messages", conversationId],
     queryFn: () => fetchMessages(conversationId),
@@ -19,7 +35,9 @@ const ChatDashboard = () => {
   const sendMessageMutation = useMutation({
     mutationFn: sendMessage,
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey:["messages", conversationId]});
+      queryClient.invalidateQueries({
+        queryKey: ["messages", conversationId],
+      });
       setText("");
     },
   });
@@ -38,17 +56,29 @@ const ChatDashboard = () => {
 
   return (
     <div className="flex-1 flex flex-col">
+      {/* HEADER */}
       <div
-        className="px-4 py-3 border-b font-semibold"
+        className="px-4 py-3 border-b font-semibold flex items-center gap-3"
         style={{
           borderColor: "var(--border-main)",
           backgroundColor: "var(--bg-card)",
           color: "var(--text-main)",
         }}
       >
-        Conversation #{conversationId}
+        <div
+          className="w-9 h-9 rounded-full flex items-center justify-center font-semibold"
+          style={{
+            backgroundColor: "var(--accent-secondary)",
+            color: "#020617",
+          }}
+        >
+          {receiver?.user_name?.charAt(0) || "?"}
+        </div>
+
+        <span>{receiver?.user_name || "Chat"}</span>
       </div>
 
+      {/* MESSAGES */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.length === 0 ? (
           <p
@@ -82,6 +112,7 @@ const ChatDashboard = () => {
         <div ref={bottomRef} />
       </div>
 
+      {/* INPUT */}
       <form
         onSubmit={(e) => {
           e.preventDefault();

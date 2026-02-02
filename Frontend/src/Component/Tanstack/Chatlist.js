@@ -15,11 +15,24 @@ export const getConversation = async (userId) => {
 /* Fetch messages of a conversation */
 export const fetchMessages = async (conversationId) => {
   const res = await api.get(`/chat/messages/${conversationId}`);
-  return res.data;
+  return res.data; 
 };
+
 
 /* Send a message */
 export const sendMessage = async (data) => {
   const res = await api.post("/chat/message", data);
+  return res.data;
+};
+
+/* Fetch conversation meta */
+export const fetchConversationMeta = async (conversationId) => {
+  const res = await api.get(`/chat/conversation/${conversationId}`);
+  return res.data;
+};
+
+/* Fetch user by id */
+export const fetchUserById = async (userId) => {
+  const res = await api.get(`/user/${userId}`);
   return res.data;
 };

@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { Conversation, Message } from "../models/index.js";
+import { Conversation, Message, Authentication } from "../models/index.js";
 
 /* ---------------- GET OR CREATE CONVERSATION ---------------- */
 export const getOrCreateConversation = async (req, res) => {
@@ -100,4 +100,49 @@ export const sendMessage = async (req, res) => {
     console.error("Send message error:", err);
     res.status(500).json({ message: "Failed to send message" });
   }
+};
+/* ---------------- GET CONVERSATION META ---------------- */
+export const getConversationMeta = async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const me = req.user.auth_id;
+
+    const conversation = await Conversation.findOne({
+      where: {
+        conversation_id: conversationId,
+        [Op.or]: [{ user1_id: me }, { user2_id: me }],
+      },
+    });
+
+    if (!conversation) {
+      return res.status(404).json({ message: "Conversation not found" });
+    }
+
+    const receiverId =
+      conversation.user1_id === me
+        ? conversation.user2_id
+        : conversation.user1_id;
+
+    res.json({
+      conversation_id: conversation.conversation_id,
+      receiver_id: receiverId,
+    });
+  } catch (err) {
+    console.error("Conversation meta error:", err);
+    res.status(500).json({ message: "Failed to load conversation" });
+  }
+};
+
+
+
+export const getUserById = async (req, res) => {
+  const user = await Authentication.findByPk(req.params.userId, {
+    attributes: ["auth_id", "user_name"],
+  });
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  res.json(user);
 };
