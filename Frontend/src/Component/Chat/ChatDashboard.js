@@ -2,15 +2,13 @@ import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
-
+import socket from "../../socket";
 import {
   fetchMessages,
   sendMessage,
   fetchConversationMeta,
   fetchUserById,
 } from "../Tanstack/Chatlist";
-
-import socket from "../../socket";
 
 const ChatDashboard = () => {
   const { conversationId } = useParams();
