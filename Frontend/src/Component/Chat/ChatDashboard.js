@@ -2,7 +2,8 @@ import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
-import socket from "../../socket/socket";
+// import socket from "../../socket/socket";
+import { useSocket } from "../../socket/socketContext";
 import {
   fetchMessages,
   sendMessage,
@@ -14,7 +15,7 @@ const ChatDashboard = () => {
   const { conversationId } = useParams();
   const currentUser = useSelector((state) => state.auth.user);
   const queryClient = useQueryClient();
-
+  const socket=useSocket();
   const [text, setText] = useState("");
   const bottomRef = useRef(null);
 
@@ -44,19 +45,18 @@ const ChatDashboard = () => {
     socket.emit("join_conversation", conversationId);
 
     socket.on("receive_message", (message) => {
-      queryClient.invalidateQueries(["messages", conversationId], (old = []) => {
-        // prevent duplicates
-        // if (message.conversation_id !== Number(conversationId)) return;
+      queryClient.invalidateQueries({queryKey:["messages", conversationId]}
+        // , (old = []) => {
 
-        if (old.some((m) => m.id === message.id )) return old;
-        return [...old, message];
-      });
+        // if (old.some((m) => m.id === message.id )) return old;
+        // return [...old, message];}
+      );
     });
 
     return () => {
       socket.off("receive_message");
     };
-  }, [conversationId, queryClient]);
+  }, [conversationId, socket , queryClient]);
 
   const sendMessageMutation = useMutation({
     mutationFn: sendMessage,
