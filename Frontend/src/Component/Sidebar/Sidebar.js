@@ -16,8 +16,8 @@ const SideBar = () => {
 
   const openChatMutation = useMutation({
     mutationFn: getConversation,
-    onSuccess: (convo) => {
-      navigate(`/chat/${convo.conversation_id}`);
+    onSuccess: (conver) => {
+      navigate(`/chat/${conver.conversation_id}`);
       setOpeningUserId(null);
     },
     onError: () => {

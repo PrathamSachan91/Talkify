@@ -1,35 +1,42 @@
 :root {
   /* ===== BACKGROUND ===== */
-  --bg-gradient-start: #020617;   /* very dark navy */
-  --bg-gradient-mid: #052e2b;     /* dark green-teal */
+  --bg-gradient-start: #020617;   /* deep navy */
+  --bg-gradient-mid: #022c22;     /* richer emerald */
   --bg-gradient-end: #020617;
 
-  --bg-card: rgba(6, 78, 59, 0.45); /* dark green glass */
-  --bg-input: #064e3b;             /* emerald-900 */
+  /* Slightly lighter glass for contrast */
+  --bg-card: rgba(6, 78, 59, 0.65);
+  --bg-input: #052e2b;            /* darker input */
   --bg-disabled: #020617;
 
   /* ===== BORDER ===== */
-  --border-main: #065f46;   /* emerald-800 */
-  --border-input: #047857; /* emerald-700 */
+  --border-main: #0f766e;   /* teal-700 */
+  --border-input: #14b8a6;  /* teal-500 */
 
   /* ===== TEXT ===== */
   --text-main: #ecfdf5;        /* emerald-50 */
-  --text-muted: #9ca3af;       /* neutral gray */
-  --text-placeholder: #6b7280; /* gray-500 */
-  --text-label: #a7f3d0;       /* emerald-200 */
+  --text-muted: #94a3b8;       /* slate-400 (cleaner than gray) */
+  --text-placeholder: #64748b; /* slate-500 */
+  --text-label: #99f6e4;       /* teal-200 */
 
   /* ===== BRAND COLORS ===== */
-  --accent-primary: #22c55e;   /* green-500 */
-  --accent-secondary: #14b8a6; /* teal-500 */
+  --accent-primary: #22c55e;   /* green-500 (keep) */
+  --accent-secondary: #2dd4bf; /* brighter teal-400 */
+
+  /* Message-specific (new) */
+  --msg-me: #22c55e;           /* sent message */
+  --msg-other: #064e3b;        /* received message */
 
   /* ===== STATUS ===== */
-  --success: #22c55e; /* green */
-  --danger: #ef4444;  /* red */
+  --success: #22c55e;
+  --danger: #f87171;
 
   /* ===== UI ===== */
   --radius-sm: 8px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
 
-  --shadow-card: 0 20px 40px rgba(0, 0, 0, 0.55);
+  --shadow-card: 
+    0 10px 25px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }

@@ -42,14 +42,11 @@ const ChatDashboard = () => {
     socket.emit("join_conversation", conversationId);
 
     socket.on("receive_message", (message) => {
-      queryClient.setQueryData(
-        ["messages", conversationId],
-        (old = []) => {
-          // prevent duplicates
-          if (old.some((m) => m.id === message.id)) return old;
-          return [...old, message];
-        }
-      );
+      queryClient.setQueryData(["messages", conversationId], (old = []) => {
+        // prevent duplicates
+        if (old.some((m) => m.id === message.id)) return old;
+        return [...old, message];
+      });
     });
 
     return () => {
@@ -116,17 +113,19 @@ const ChatDashboard = () => {
             return (
               <div
                 key={msg.id}
-                className={`max-w-xs px-4 py-2 rounded-lg text-sm ${
-                  isMe ? "ml-auto" : "mr-auto"
-                }`}
-                style={{
-                  backgroundColor: isMe
-                    ? "var(--accent-primary)"
-                    : "var(--bg-input)",
-                  color: isMe ? "#020617" : "var(--text-main)",
-                }}
+                className={`flex ${isMe ? "justify-end" : "justify-start"}`}
               >
-                {msg.text}
+                <div
+                  className="inline-block max-w-[60%] px-4 py-2 rounded-lg text-sm break-words"
+                  style={{
+                    backgroundColor: isMe
+                      ? "var(--accent-primary)"
+                      : "var(--bg-input)",
+                    color: isMe ? "#020617" : "var(--text-main)",
+                  }}
+                >
+                  {msg.text}
+                </div>
               </div>
             );
           })
