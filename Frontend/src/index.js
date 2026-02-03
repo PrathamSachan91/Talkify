@@ -6,9 +6,9 @@ import { Provider } from "react-redux";
 import { store } from "./Component/redux/store";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
 import "./index.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import SocketProvider  from "./socket/socketProvider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,7 +28,9 @@ root.render(
     <React.StrictMode>
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
-          <App />
+          <SocketProvider>
+            <App />
+          </SocketProvider>
         </QueryClientProvider>
       </Provider>
     </React.StrictMode>

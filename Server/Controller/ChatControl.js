@@ -99,13 +99,10 @@ export const sendMessage = async (req, res) => {
 
     /* 🔥 Emit via socket */
     const io = getIO();
-    io.to(`conversation-${conversationId}`).emit("receive_message", {
-      id: message.id,
-      conversation_id: message.conversation_id,
-      sender_id: message.sender_id,
-      text: message.text,
-      createdAt: message.createdAt,
-    });
+    io.to(`conversation-${conversationId}`).emit(
+      "receive_message",
+      message.toJSON(),
+    );
 
     res.status(201).json(message);
   } catch (err) {
