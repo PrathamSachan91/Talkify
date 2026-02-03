@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
-import { useSocket } from "../../socket/socketContext";
+import socket from "../../socket/socket";
 import {
   fetchMessages,
   sendMessage,
@@ -17,7 +17,7 @@ const ChatDashboard = () => {
 
   const [text, setText] = useState("");
   const bottomRef = useRef(null);
-  const socket = useSocket();
+
   const { data: convo } = useQuery({
     queryKey: ["conversation-meta", conversationId],
     queryFn: () => fetchConversationMeta(conversationId),
@@ -37,19 +37,26 @@ const ChatDashboard = () => {
   });
 
   useEffect(() => {
-    if (!socket || !socket.connected || !conversationId) return;
-
+    if (!conversationId) return;
+    queryClient.invalidateQueries({
+      queryKey: ["messages", conversationId],
+    });
     socket.emit("join_conversation", conversationId);
 
-    const onMessage = (message) => {
-      queryClient.setQueryData(["messages", conversationId], (old = []) =>
-        old.some((m) => m.id === message.id) ? old : [...old, message],
-      );
-    };
+    socket.on("receive_message", (message) => {
+      queryClient.invalidateQueries(["messages", conversationId], (old = []) => {
+        // prevent duplicates
+        // if (message.conversation_id !== Number(conversationId)) return;
 
-    socket.on("receive_message", onMessage);
-    return () => socket.off("receive_message", onMessage);
-  }, [socket, conversationId, queryClient]);
+        if (old.some((m) => m.id === message.id )) return old;
+        return [...old, message];
+      });
+    });
+
+    return () => {
+      socket.off("receive_message");
+    };
+  }, [conversationId, queryClient]);
 
   const sendMessageMutation = useMutation({
     mutationFn: sendMessage,
