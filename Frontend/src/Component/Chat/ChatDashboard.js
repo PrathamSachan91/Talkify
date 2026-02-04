@@ -32,7 +32,7 @@ const ChatDashboard = () => {
   const { data: receiver } = useQuery({
     queryKey: ["user", convo?.receiver_id],
     queryFn: () => fetchUserById(convo.receiver_id),
-    enabled: !!convo?.receiver_id,
+    enabled: convo?.type === "private" && !!convo?.receiver_id,
   });
 
   const { data: messages = [], isLoading } = useQuery({
@@ -97,10 +97,16 @@ const ChatDashboard = () => {
             color: "#020617",
           }}
         >
-          {receiver?.user_name?.charAt(0) || "?"}
+          {convo?.type === "group"
+            ? convo.group_name?.charAt(0)
+            : receiver?.user_name?.charAt(0) || "?"}
         </div>
 
-        <span>{receiver?.user_name || "Chat"}</span>
+        <span>
+          {convo?.type === "group"
+            ? convo.group_name
+            : receiver?.user_name || "Chat"}
+        </span>
       </div>
 
       {/* ================= MESSAGES ================= */}
@@ -143,10 +149,7 @@ const ChatDashboard = () => {
                             JSON.stringify(urls),
                           );
 
-                          window.open(
-                            `/image.html?images=${query}`,
-                            "_blank",
-                          );
+                          window.open(`/image.html?images=${query}`, "_blank");
                         }}
                       >
                         {/* FIRST IMAGE */}

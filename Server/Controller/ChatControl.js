@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
-import { Conversation, Message, Authentication } from "../models/index.js";
-import { getIO } from "../socket.js"; // adjust path if needed
+import { Conversation, Message, Authentication,ConversationMember } from "../models/index.js";
+import { getIO } from "../socket.js";
 
 /* ---------------- GET OR CREATE CONVERSATION ---------------- */
 export const getOrCreateConversation = async (req, res) => {
@@ -41,15 +41,29 @@ export const getMessages = async (req, res) => {
     const { conversationId } = req.params;
     const me = req.user.auth_id;
 
-    const conversation = await Conversation.findOne({
-      where: {
-        conversation_id: conversationId,
-        [Op.or]: [{ user1_id: me }, { user2_id: me }],
-      },
-    });
+    const conversation = await Conversation.findByPk(conversationId);
 
     if (!conversation) {
-      return res.status(403).json({ message: "Access denied" });
+      return res.status(404).json({ message: "Conversation not found" });
+    }
+
+    if (conversation.type === "private") {
+      if (![conversation.user1_id, conversation.user2_id].includes(me)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
+
+    if (conversation.type === "group") {
+      const isMember = await ConversationMember.findOne({
+        where: {
+          conversation_id: conversationId,
+          user_id: me,
+        },
+      });
+
+      if (!isMember) {
+        return res.status(403).json({ message: "Access denied" });
+      }
     }
 
     const messages = await Message.findAll({
@@ -65,7 +79,6 @@ export const getMessages = async (req, res) => {
 };
 
 /* ---------------- SEND MESSAGE ---------------- */
-
 export const sendMessage = async (req, res) => {
   try {
     const { conversationId, text } = req.body;
@@ -75,15 +88,29 @@ export const sendMessage = async (req, res) => {
       return res.status(400).json({ message: "Conversation ID required" });
     }
 
-    const conversation = await Conversation.findOne({
-      where: {
-        conversation_id: conversationId,
-        [Op.or]: [{ user1_id: me }, { user2_id: me }],
-      },
-    });
+    const conversation = await Conversation.findByPk(conversationId);
 
     if (!conversation) {
-      return res.status(403).json({ message: "Access denied" });
+      return res.status(404).json({ message: "Conversation not found" });
+    }
+
+    if (conversation.type === "private") {
+      if (![conversation.user1_id, conversation.user2_id].includes(me)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
+
+    if (conversation.type === "group") {
+      const isMember = await ConversationMember.findOne({
+        where: {
+          conversation_id: conversationId,
+          user_id: me,
+        },
+      });
+
+      if (!isMember) {
+        return res.status(403).json({ message: "Access denied" });
+      }
     }
 
     const cleanText = text?.trim() || null;
@@ -98,14 +125,14 @@ export const sendMessage = async (req, res) => {
     }
 
     let type = "text";
-    if (images.length > 0 && cleanText) type = "mixed";
-    else if (images.length > 0) type = "image";
+    if (images.length && cleanText) type = "mixed";
+    else if (images.length) type = "image";
 
     const message = await Message.create({
       conversation_id: conversationId,
       sender_id: me,
       text: cleanText,
-      images,       // JSON array
+      images,
       type,
     });
 
@@ -122,36 +149,43 @@ export const sendMessage = async (req, res) => {
   }
 };
 
-
 /* ---------------- GET CONVERSATION META ---------------- */
 export const getConversationMeta = async (req, res) => {
   try {
     const { conversationId } = req.params;
     const me = req.user.auth_id;
 
-    const conversation = await Conversation.findOne({
-      where: {
-        conversation_id: conversationId,
-        [Op.or]: [{ user1_id: me }, { user2_id: me }],
-      },
-    });
+    const conversation = await Conversation.findByPk(conversationId);
 
     if (!conversation) {
       return res.status(404).json({ message: "Conversation not found" });
     }
 
-    const receiverId =
-      conversation.user1_id === me
-        ? conversation.user2_id
-        : conversation.user1_id;
+    // PRIVATE CHAT
+    if (conversation.type === "private") {
+      if (![conversation.user1_id, conversation.user2_id].includes(me)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
 
-    res.json({
-      conversation_id: conversation.conversation_id,
-      receiver_id: receiverId,
+      const receiverId =
+        conversation.user1_id === me
+          ? conversation.user2_id
+          : conversation.user1_id;
+
+      return res.json({
+        type: "private",
+        receiver_id: receiverId,
+      });
+    }
+
+    // GROUP CHAT
+    return res.json({
+      type: "group",
+      group_name: conversation.group_name,
     });
   } catch (err) {
     console.error("Conversation meta error:", err);
-    res.status(500).json({ message: "Failed to load conversation" });
+    res.status(500).json({ message: "Failed to fetch meta" });
   }
 };
 
