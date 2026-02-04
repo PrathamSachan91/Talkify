@@ -15,7 +15,7 @@ router.post("/auth/google",googleLogin)
 router.get("/ChatList",requireAuth,getAllUsers);
 router.post("/chat/conversation",requireAuth,getOrCreateConversation);
 router.get("/chat/messages/:conversationId",requireAuth,getMessages);
-router.post("/chat/message",requireAuth,upload.single("image"),sendMessage);
+router.post("/chat/message",requireAuth,upload.array("images",5),sendMessage);
 router.get("/user/:userId", requireAuth, getUserById);
 router.get("/chat/conversation/:conversationId", requireAuth,getConversationMeta);
 

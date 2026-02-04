@@ -19,8 +19,8 @@ const ChatDashboard = () => {
   const socket = useSocket();
   const [text, setText] = useState("");
   const bottomRef = useRef(null);
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(null);
+  const [images, setImages] = useState([]);
+  const [previews, setPreviews] = useState([]);
 
   const fileInputRef = useRef(null);
 
@@ -62,8 +62,9 @@ const ChatDashboard = () => {
     mutationFn: sendMessage,
     onSuccess: () => {
       setText("");
-      setImage(null);
-      setPreview(null);
+      setImages([]);
+      setPreviews([]);
+      fileInputRef.current.value = null;
     },
   });
 
@@ -130,15 +131,22 @@ const ChatDashboard = () => {
                     color: isMe ? "#020617" : "var(--text-main)",
                   }}
                 >
-                  {msg.type === "image" ? (
-                    <img
-                      src={`http://localhost:3001${msg.image_url}`}
-                      alt="sent"
-                      className="max-w-60 max-h-60 rounded-lg object-contain"
-                    />
-                  ) : (
-                    msg.text
-                  )}
+                  <div className="space-y-2">
+
+                    {msg.images?.length > 0 && (
+                      <div className="grid grid-cols-2 gap-2">
+                        {msg.images.map((img, idx) => (
+                          <img
+                            key={idx}
+                            src={`http://localhost:3001${img}`}
+                            alt="sent"
+                            className="max-w-60 max-h-60 object-contain rounded-lg"
+                          />
+                        ))}
+                      </div>
+                    )}
+                    {msg.text && <p>{msg.text}</p>}
+                  </div>
                 </div>
               </div>
             );
@@ -146,28 +154,38 @@ const ChatDashboard = () => {
         )}
         <div ref={bottomRef} />
       </div>
-      {preview && (
+      {previews && previews.length > 0 && (
         <div
-          className="px-3 py-2 border-t flex items-center gap-3"
+          className="px-3 py-2 border-t flex gap-3 flex-wrap"
           style={{ backgroundColor: "var(--bg-card)" }}
         >
-          <img
-            src={preview}
-            alt="preview"
-            className="max-w-40 max-h-40 object-cover rounded-lg border"
-          />
+          {previews.map((src, idx) => (
+            <div key={idx} className="relative">
+              <img
+                src={src}
+                alt="preview"
+                className="max-w-40 max-h-40 object-cover rounded-lg border"
+              />
 
-          <button
-            type="button"
-            onClick={() => {
-              setImage(null);
-              setPreview(null);
-              fileInputRef.current.value = null;
-            }}
-            className="text-sm text-red-500"
-          >
-            Remove
-          </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const newImages = images.filter((_, i) => i !== idx);
+                  const newPreviews = previews.filter((_, i) => i !== idx);
+
+                  setImages(newImages.length ? newImages : null);
+                  setPreviews(newPreviews.length ? newPreviews : null);
+
+                  if (newImages.length === 0) {
+                    fileInputRef.current.value = null;
+                  }
+                }}
+                className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
@@ -175,12 +193,12 @@ const ChatDashboard = () => {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (!text.trim() && !image) return;
+          if (!text.trim() && !images) return;
 
           sendMessageMutation.mutate({
             conversationId,
             text,
-            image,
+            images,
           });
         }}
         className="p-3 border-t flex gap-2"
@@ -192,16 +210,16 @@ const ChatDashboard = () => {
         <input
           type="file"
           accept="image/*"
+          multiple
           ref={fileInputRef}
           style={{ display: "none" }}
           onChange={(e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            setImage(file);
-            setPreview(URL.createObjectURL(file));
+            const files = Array.from(e.target.files);
+            setImages(files);
+            setPreviews(files.map((f) => URL.createObjectURL(f)));
           }}
         />
+
         <div className="relative flex-1">
           {/* 📎 ICON */}
           <button

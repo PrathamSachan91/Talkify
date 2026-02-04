@@ -86,29 +86,37 @@ export const sendMessage = async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    let type = "text";
-    let image_url = null;
-    let cleanText = text?.trim() || null;
+    const cleanText = text?.trim() || null;
 
-    if (req.file) {
-      type = "image";
-      image_url = `/uploads/chat/${req.file.filename}`;
-    }
+    // 🔥 MULTIPLE IMAGES
+    const files = req.files || [];
+    const images = files.map(
+      (file) => `/uploads/chat/${file.filename}`
+    );
 
-    if (!cleanText && !image_url) {
+    // ❌ nothing to send
+    if (!cleanText && images.length === 0) {
       return res.status(400).json({ message: "Empty message" });
     }
+
+    // 🔥 MESSAGE TYPE
+    let type = "text";
+    if (images.length > 0 && cleanText) type = "mixed";
+    else if (images.length > 0) type = "image";
 
     const message = await Message.create({
       conversation_id: conversationId,
       sender_id: me,
       text: cleanText,
+      images,       // JSON array
       type,
-      image_url,
     });
 
     const io = getIO();
-    io.to(`conversation-${conversationId}`).emit("receive_message", message);
+    io.to(`conversation-${conversationId}`).emit(
+      "receive_message",
+      message
+    );
 
     res.status(201).json(message);
   } catch (err) {
@@ -116,6 +124,7 @@ export const sendMessage = async (req, res) => {
     res.status(500).json({ message: "Failed to send message" });
   }
 };
+
 
 /* ---------------- GET CONVERSATION META ---------------- */
 export const getConversationMeta = async (req, res) => {

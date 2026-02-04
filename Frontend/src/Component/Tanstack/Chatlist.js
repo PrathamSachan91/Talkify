@@ -24,12 +24,12 @@ export const fetchMessages = async (conversationId) => {
 //   const res = await api.post("/chat/message", data);
 //   return res.data;
 // };
-export const sendMessage = async ({ conversationId, text, image }) => {
+export const sendMessage = async ({ conversationId, text, images }) => {
   const formData = new FormData();
   formData.append("conversationId", conversationId);
 
   if (text) formData.append("text", text);
-  if (image) formData.append("image", image);
+  images.forEach((img) => formData.append("images", img));
 
   const res = await api.post("/chat/message", formData, {
     headers: { "Content-Type": "multipart/form-data" },

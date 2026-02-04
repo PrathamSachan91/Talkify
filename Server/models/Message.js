@@ -14,7 +14,7 @@ const Message = sequelize.define(
       allowNull: false,
     },
     type: {
-      type: DataTypes.ENUM("text", "image"),
+      type: DataTypes.ENUM("text", "image","mixed"),
       allowNull: false,
       defaultValue: "text",
     },
@@ -26,8 +26,8 @@ const Message = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    image_url: {
-      type: DataTypes.STRING,
+    images: {
+      type: DataTypes.JSON,
       allowNull: true,
     },
   },
