@@ -4,10 +4,9 @@ import Authentication from "../models/Authentication.js";
 import AuthToken from "../models/token.js";
 import crypto from "crypto";
 import { OAuth2Client } from "google-auth-library";
+import { getIO } from "../socket.js";
 
-const googleClient = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID
-);
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const hashToken = (token) =>
   crypto.createHash("sha256").update(token).digest("hex");
@@ -52,6 +51,12 @@ export const Signin = async (req, res) => {
       secure: false,
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    const io = getIO();
+    io.emit("user_created", {
+      auth_id: user.auth_id,
+      user_name: user.user_name,
     });
 
     return res.status(201).json({
@@ -155,11 +160,9 @@ export const googleLogin = async (req, res) => {
 
     await user.update({ last_active: new Date() });
 
-    const token = jwt.sign(
-      { auth_id: user.auth_id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = jwt.sign({ auth_id: user.auth_id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     await AuthToken.destroy({
       where: { auth_id: user.auth_id },
@@ -184,7 +187,6 @@ export const googleLogin = async (req, res) => {
     res.status(500).json({ message: "Google authentication failed" });
   }
 };
-
 
 /* ---------------- GET CURRENT USER ---------------- */
 export const getUser = async (req, res) => {

@@ -1,13 +1,17 @@
 import { useSelector } from "react-redux";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchUsers, getConversation } from "../Tanstack/Chatlist";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSocket } from "../../socket/socketContext";
 
 const SideBar = () => {
   const currentUser = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
   const [openingUserId, setOpeningUserId] = useState(null);
+
+  const socket = useSocket();
+  const queryClient = useQueryClient();
 
   const { data: users = [], isLoading } = useQuery({
     queryKey: ["users"],
@@ -32,6 +36,23 @@ const SideBar = () => {
     openChatMutation.mutate(userId);
   };
 
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleUserCreated = (user) => {
+      queryClient.setQueryData(["users"], (old = []) => {
+        if (old.some((u) => u.auth_id === user.auth_id)) return old;
+        return [...old, user];
+      });
+    };
+
+    socket.on("user_created", handleUserCreated);
+
+    return () => {
+      socket.off("user_created", handleUserCreated);
+    };
+  }, [socket, queryClient]);
+
   if (isLoading) {
     return (
       <aside className="w-64 h-full flex items-center justify-center">
@@ -40,9 +61,7 @@ const SideBar = () => {
     );
   }
 
-  const filteredUsers = users.filter(
-    (u) => u.auth_id !== currentUser?.auth_id
-  );
+  const filteredUsers = users.filter((u) => u.auth_id !== currentUser?.auth_id);
 
   return (
     <aside
