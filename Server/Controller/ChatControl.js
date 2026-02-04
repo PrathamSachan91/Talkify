@@ -97,7 +97,6 @@ export const sendMessage = async (req, res) => {
       text: cleanText,
     });
 
-    /* 🔥 Emit via socket */
     const io = getIO();
     io.to(`conversation-${conversationId}`).emit("receive_message", {
       id: message.id,
@@ -107,13 +106,6 @@ export const sendMessage = async (req, res) => {
       createdAt: message.createdAt,
     });
     
-    /* 🔥 Emit via socket */
-    // const io = getIO();
-    // io.to(`conversation-${conversationId}`).emit(
-    //   "receive_message",
-    //   message.toJSON(),
-    // );
-
     res.status(201).json(message);
   } catch (err) {
     console.error("Send message error:", err);
