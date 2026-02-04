@@ -20,10 +20,24 @@ export const fetchMessages = async (conversationId) => {
 
 
 /* Send a message */
-export const sendMessage = async (data) => {
-  const res = await api.post("/chat/message", data);
+// export const sendMessage = async (data) => {
+//   const res = await api.post("/chat/message", data);
+//   return res.data;
+// };
+export const sendMessage = async ({ conversationId, text, image }) => {
+  const formData = new FormData();
+  formData.append("conversationId", conversationId);
+
+  if (text) formData.append("text", text);
+  if (image) formData.append("image", image);
+
+  const res = await api.post("/chat/message", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
   return res.data;
 };
+
 
 /* Fetch conversation meta */
 export const fetchConversationMeta = async (conversationId) => {

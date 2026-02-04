@@ -25,6 +25,7 @@ app.use(cookieParser());
 
 /* Routes */
 app.use("/api", routes);
+app.use("/uploads", express.static("uploads"));
 
 /* Init Socket */
 initSocket(server);

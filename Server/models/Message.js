@@ -13,13 +13,22 @@ const Message = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    type: {
+      type: DataTypes.ENUM("text", "image"),
+      allowNull: false,
+      defaultValue: "text",
+    },
     sender_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
     text: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
+    },
+    image_url: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

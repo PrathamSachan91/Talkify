@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 // import socket from "../../socket/socket";
 import { useSocket } from "../../socket/socketContext";
+import { Paperclip } from "lucide-react";
 import {
   fetchMessages,
   sendMessage,
@@ -15,9 +16,13 @@ const ChatDashboard = () => {
   const { conversationId } = useParams();
   const currentUser = useSelector((state) => state.auth.user);
   const queryClient = useQueryClient();
-  const socket=useSocket();
+  const socket = useSocket();
   const [text, setText] = useState("");
   const bottomRef = useRef(null);
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+
+  const fileInputRef = useRef(null);
 
   const { data: convo } = useQuery({
     queryKey: ["conversation-meta", conversationId],
@@ -45,23 +50,20 @@ const ChatDashboard = () => {
     socket.emit("join_conversation", conversationId);
 
     socket.on("receive_message", (message) => {
-      queryClient.invalidateQueries({queryKey:["messages", conversationId]}
-        // , (old = []) => {
-
-        // if (old.some((m) => m.id === message.id )) return old;
-        // return [...old, message];}
-      );
+      queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
     });
 
     return () => {
       socket.off("receive_message");
     };
-  }, [conversationId, socket , queryClient]);
+  }, [conversationId, socket, queryClient]);
 
   const sendMessageMutation = useMutation({
     mutationFn: sendMessage,
     onSuccess: () => {
       setText("");
+      setImage(null);
+      setPreview(null);
     },
   });
 
@@ -128,7 +130,15 @@ const ChatDashboard = () => {
                     color: isMe ? "#020617" : "var(--text-main)",
                   }}
                 >
-                  {msg.text}
+                  {msg.type === "image" ? (
+                    <img
+                      src={`http://localhost:3001${msg.image_url}`}
+                      alt="sent"
+                      className="max-w-60 max-h-60 rounded-lg object-contain"
+                    />
+                  ) : (
+                    msg.text
+                  )}
                 </div>
               </div>
             );
@@ -136,16 +146,41 @@ const ChatDashboard = () => {
         )}
         <div ref={bottomRef} />
       </div>
+      {preview && (
+        <div
+          className="px-3 py-2 border-t flex items-center gap-3"
+          style={{ backgroundColor: "var(--bg-card)" }}
+        >
+          <img
+            src={preview}
+            alt="preview"
+            className="max-w-40 max-h-40 object-cover rounded-lg border"
+          />
+
+          <button
+            type="button"
+            onClick={() => {
+              setImage(null);
+              setPreview(null);
+              fileInputRef.current.value = null;
+            }}
+            className="text-sm text-red-500"
+          >
+            Remove
+          </button>
+        </div>
+      )}
 
       {/* ================= INPUT ================= */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (!text.trim()) return;
+          if (!text.trim() && !image) return;
 
           sendMessageMutation.mutate({
             conversationId,
             text,
+            image,
           });
         }}
         className="p-3 border-t flex gap-2"
@@ -155,16 +190,42 @@ const ChatDashboard = () => {
         }}
       >
         <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Type a message..."
-          className="flex-1 px-4 py-2 rounded-md outline-none"
-          style={{
-            backgroundColor: "var(--bg-input)",
-            color: "var(--text-main)",
-            border: "1px solid var(--border-input)",
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          style={{ display: "none" }}
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            setImage(file);
+            setPreview(URL.createObjectURL(file));
           }}
         />
+        <div className="relative flex-1">
+          {/* 📎 ICON */}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current.click()}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+            title="Attach image"
+          >
+            <Paperclip size={18} />
+          </button>
+
+          {/* TEXT INPUT */}
+          <input
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Type a message..."
+            className="w-full pl-10 pr-4 py-2 rounded-md outline-none"
+            style={{
+              backgroundColor: "var(--bg-input)",
+              color: "var(--text-main)",
+              border: "1px solid var(--border-input)",
+            }}
+          />
+        </div>
 
         <button
           type="submit"

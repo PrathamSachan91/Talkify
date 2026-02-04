@@ -75,11 +75,6 @@ export const sendMessage = async (req, res) => {
       return res.status(400).json({ message: "Conversation ID required" });
     }
 
-    const cleanText = text?.trim();
-    if (!cleanText) {
-      return res.status(400).json({ message: "Message cannot be empty" });
-    }
-
     const conversation = await Conversation.findOne({
       where: {
         conversation_id: conversationId,
@@ -91,21 +86,30 @@ export const sendMessage = async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
+    let type = "text";
+    let image_url = null;
+    let cleanText = text?.trim() || null;
+
+    if (req.file) {
+      type = "image";
+      image_url = `/uploads/chat/${req.file.filename}`;
+    }
+
+    if (!cleanText && !image_url) {
+      return res.status(400).json({ message: "Empty message" });
+    }
+
     const message = await Message.create({
       conversation_id: conversationId,
       sender_id: me,
       text: cleanText,
+      type,
+      image_url,
     });
 
     const io = getIO();
-    io.to(`conversation-${conversationId}`).emit("receive_message", {
-      id: message.id,
-      conversation_id: message.conversation_id,
-      sender_id: message.sender_id,
-      text: message.text,
-      createdAt: message.createdAt,
-    });
-    
+    io.to(`conversation-${conversationId}`).emit("receive_message", message);
+
     res.status(201).json(message);
   } catch (err) {
     console.error("Send message error:", err);
