@@ -2,7 +2,6 @@ import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
-// import socket from "../../socket/socket";
 import { useSocket } from "../../socket/socketContext";
 import { Paperclip } from "lucide-react";
 import {
@@ -132,19 +131,42 @@ const ChatDashboard = () => {
                   }}
                 >
                   <div className="space-y-2">
-
                     {msg.images?.length > 0 && (
-                      <div className="grid grid-cols-2 gap-2">
-                        {msg.images.map((img, idx) => (
-                          <img
-                            key={idx}
-                            src={`http://localhost:3001${img}`}
-                            alt="sent"
-                            className="max-w-60 max-h-60 object-contain rounded-lg"
-                          />
-                        ))}
+                      <div
+                        className="relative cursor-pointer inline-block"
+                        onClick={() => {
+                          const urls = msg.images.map(
+                            (img) => `http://localhost:3001${img}`,
+                          );
+
+                          const query = encodeURIComponent(
+                            JSON.stringify(urls),
+                          );
+
+                          window.open(
+                            `/image.html?images=${query}`,
+                            "_blank",
+                          );
+                        }}
+                      >
+                        {/* FIRST IMAGE */}
+                        <img
+                          src={`http://localhost:3001${msg.images[0]}`}
+                          alt="sent"
+                          className="max-w-60 max-h-60 object-contain rounded-lg"
+                        />
+
+                        {/* OVERLAY IF MULTIPLE */}
+                        {msg.images.length > 1 && (
+                          <div className="absolute inset-0 bg-black/60 flex items-end justify-end rounded-lg px-2 py-1">
+                            <span className="text-white text-xl font-semibold">
+                              +{msg.images.length - 1}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     )}
+
                     {msg.text && <p>{msg.text}</p>}
                   </div>
                 </div>
@@ -221,7 +243,6 @@ const ChatDashboard = () => {
         />
 
         <div className="relative flex-1">
-          {/* 📎 ICON */}
           <button
             type="button"
             onClick={() => fileInputRef.current.click()}

@@ -88,18 +88,15 @@ export const sendMessage = async (req, res) => {
 
     const cleanText = text?.trim() || null;
 
-    // 🔥 MULTIPLE IMAGES
     const files = req.files || [];
     const images = files.map(
       (file) => `/uploads/chat/${file.filename}`
     );
 
-    // ❌ nothing to send
     if (!cleanText && images.length === 0) {
       return res.status(400).json({ message: "Empty message" });
     }
 
-    // 🔥 MESSAGE TYPE
     let type = "text";
     if (images.length > 0 && cleanText) type = "mixed";
     else if (images.length > 0) type = "image";
