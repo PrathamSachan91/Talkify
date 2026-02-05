@@ -13,9 +13,7 @@ export const initSocket = (server) => {
   });
 
   io.use((socket, next) => {
-    const cookies = cookie.parse(
-      socket.handshake.headers.cookie || ""
-    );
+    const cookies = cookie.parse(socket.handshake.headers.cookie || "");
 
     const token = cookies.access_token; // name must match login cookie
 
@@ -38,6 +36,13 @@ export const initSocket = (server) => {
     socket.on("join_conversation", (conversationId) => {
       socket.join(`conversation-${conversationId}`);
       console.log(`Joined conversation-${conversationId}`);
+    });
+    
+    socket.on("typing", ({ conversationId, userId }) => {
+      socket.to(`conversation-${conversationId}`).emit("user_typing", {
+        conversationId,
+        userId,
+      });
     });
 
     socket.on("disconnect", () => {

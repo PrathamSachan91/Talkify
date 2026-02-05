@@ -6,6 +6,7 @@ import Landing from './Component/Landing/Landing';
 import "./Component/theme.css"
 import Signin from "./Component/Signin/Signin"
 import ChatDashboard from './Component/Chat/ChatDashboard';
+import ImageView from './Component/Chat/imageView';
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
         <Route element= {<Static/>}>
           <Route path="/" element={<Landing />} />
           <Route path="/chat/:conversationId" element={<ChatDashboard />} />
-         
+          <Route path="/image-view" element={<ImageView />} />
         </Route>
       </Routes>
     </BrowserRouter>
