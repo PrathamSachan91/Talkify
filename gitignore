@@ -12,3 +12,9 @@ server/node_modules/
 
 # Logs
 npm-debug.log*
+
+# env files
+.env
+*.env
+Frontend/.env
+server/.env
