@@ -16,3 +16,24 @@ export const getMyGroups = async (req, res) => {
 
   res.json(groups);
 };
+
+export const getBroadcast = async (req, res) => {
+  try {
+    let broadcast = await Conversation.findOne({
+      where: { type: "broadcast" },
+    });
+
+    if (!broadcast) {
+      broadcast = await Conversation.create({
+        type: "broadcast",
+        group_name: "Public Channel",
+        created_by: null,
+      });
+    }
+
+    res.json(broadcast);
+  } catch (err) {
+    console.error("Broadcast create error:", err);
+    res.status(500).json({ message: "Failed to load broadcast" });
+  }
+};

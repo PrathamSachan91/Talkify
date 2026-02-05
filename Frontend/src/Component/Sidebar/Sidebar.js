@@ -1,10 +1,15 @@
 import { useSelector } from "react-redux";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchUsers, getConversation, fetchGroups } from "../Tanstack/Chatlist";
+import {
+  fetchUsers,
+  getConversation,
+  fetchGroups,
+  fetchBroadcast,
+  getGroup,
+} from "../Tanstack/Chatlist";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useSocket } from "../../socket/socketContext";
-import api from "../api/api";
 import CreateGroupModal from "./groupModal";
 
 const SideBar = () => {
@@ -28,6 +33,11 @@ const SideBar = () => {
     queryFn: fetchGroups,
   });
 
+  const { data: broadcast } = useQuery({
+    queryKey: ["broadcast"],
+    queryFn: fetchBroadcast,
+  });
+
   /* ---------------- OPEN PRIVATE CHAT ---------------- */
   const openChatMutation = useMutation({
     mutationFn: getConversation,
@@ -49,12 +59,11 @@ const SideBar = () => {
 
   /* ---------------- CREATE GROUP ---------------- */
   const createGroupMutation = useMutation({
-    mutationFn: (payload) =>
-      api.post("/conversations/group", payload),
-    onSuccess: (res) => {
-      queryClient.invalidateQueries(["groups"]);
+    mutationFn: getGroup,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
       setOpen(false);
-      navigate(`/chat/${res.data.conversation_id}`);
+      navigate(`/chat/${data.conversation_id}`);
     },
     onError: () => {
       alert("Failed to create group");
@@ -87,9 +96,7 @@ const SideBar = () => {
     );
   }
 
-  const filteredUsers = users.filter(
-    (u) => u.auth_id !== currentUser?.auth_id
-  );
+  const filteredUsers = users.filter((u) => u.auth_id !== currentUser?.auth_id);
 
   return (
     <aside
@@ -118,24 +125,27 @@ const SideBar = () => {
         + New Group
       </button>
 
+      {/* Create Group Modal */}
+      <CreateGroupModal
+        open={open}
+        onClose={() => setOpen(false)}
+        users={filteredUsers}
+        onCreate={(data) => createGroupMutation.mutate(data)}
+      />
+
       {/* List */}
       <ul className="overflow-y-auto flex-1">
-
         {/* GROUPS */}
         {groups.length > 0 && (
           <>
-            <li className="px-4 py-1 text-xs uppercase opacity-60">
-              Groups
-            </li>
+            <li className="px-4 py-1 text-xs uppercase opacity-60">Groups</li>
 
             {groups.map((group) => (
               <li
                 key={`group-${group.conversation_id}`}
                 className="px-4 py-3 flex items-center gap-3 cursor-pointer transition"
                 style={{ color: "var(--text-main)" }}
-                onClick={() =>
-                  navigate(`/chat/${group.conversation_id}`)
-                }
+                onClick={() => navigate(`/chat/${group.conversation_id}`)}
                 onMouseEnter={(e) =>
                   (e.currentTarget.style.backgroundColor =
                     "rgba(20, 184, 166, 0.15)")
@@ -154,11 +164,43 @@ const SideBar = () => {
                   {group.group_name.charAt(0)}
                 </div>
 
-                <span className="text-sm">
-                  {group.group_name}
-                </span>
+                <span className="text-sm">{group.group_name}</span>
               </li>
             ))}
+          </>
+        )}
+
+        {broadcast && (
+          <>
+            <li className="px-4 py-1 text-xs uppercase opacity-60 mt-2">
+              Broadcast
+            </li>
+
+            <li
+              key={`broadcast-${broadcast.conversation_id}`}
+              className="px-4 py-3 flex items-center gap-3 cursor-pointer transition"
+              style={{ color: "var(--text-main)" }}
+              onClick={() => navigate(`/chat/${broadcast.conversation_id}`)}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor =
+                  "rgba(20, 184, 166, 0.15)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "transparent")
+              }
+            >
+              <div
+                className="w-9 h-9 rounded-full flex items-center justify-center font-semibold"
+                style={{
+                  backgroundColor: "var(--accent-primary)",
+                  color: "#020617",
+                }}
+              >
+                📢
+              </div>
+
+              <span className="text-sm">{broadcast.group_name}</span>
+            </li>
           </>
         )}
 
@@ -198,14 +240,6 @@ const SideBar = () => {
           </li>
         ))}
       </ul>
-
-      {/* Create Group Modal */}
-      <CreateGroupModal
-        open={open}
-        onClose={() => setOpen(false)}
-        users={filteredUsers}
-        onCreate={(data) => createGroupMutation.mutate(data)}
-      />
     </aside>
   );
 };

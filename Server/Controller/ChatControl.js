@@ -23,6 +23,7 @@ export const getOrCreateConversation = async (req, res) => {
 
     if (!conversation) {
       conversation = await Conversation.create({
+        type: "private",
         user1_id: me,
         user2_id: userId,
       });
@@ -53,7 +54,7 @@ export const getMessages = async (req, res) => {
       }
     }
 
-    if (conversation.type === "group") {
+    if (conversation.type === "group" || conversation.type==="boardcast") {
       const isMember = await ConversationMember.findOne({
         where: {
           conversation_id: conversationId,
@@ -100,7 +101,7 @@ export const sendMessage = async (req, res) => {
       }
     }
 
-    if (conversation.type === "group") {
+    if (conversation.type === "group" || conversation.type==="boardcast") {
       const isMember = await ConversationMember.findOne({
         where: {
           conversation_id: conversationId,
@@ -177,12 +178,20 @@ export const getConversationMeta = async (req, res) => {
         receiver_id: receiverId,
       });
     }
+    if (conversation.type === "group" || conversation.type === "broadcast") {
+      await ConversationMember.findOrCreate({
+        where: {
+          conversation_id: conversationId,
+          user_id: me,
+        },
+        defaults: { role: "member" },
+      });
 
-    // GROUP CHAT
-    return res.json({
-      type: "group",
-      group_name: conversation.group_name,
-    });
+      return res.json({
+        type: conversation.type,
+        group_name: conversation.group_name,
+      });
+    }
   } catch (err) {
     console.error("Conversation meta error:", err);
     res.status(500).json({ message: "Failed to fetch meta" });

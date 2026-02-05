@@ -25,7 +25,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
-    <React.StrictMode>
+    {/* <React.StrictMode> */}
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
           <SocketProvider>
@@ -33,6 +33,6 @@ root.render(
           </SocketProvider>
         </QueryClientProvider>
       </Provider>
-    </React.StrictMode>
+    {/* </React.StrictMode> */}
   </GoogleOAuthProvider>,
 );

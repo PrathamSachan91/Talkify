@@ -1,32 +1,3 @@
-// import { DataTypes } from "sequelize";
-// import sequelize from "../lib/db.js";
-
-// const Conversation = sequelize.define(
-//   "Conversation",
-//   {
-//     conversation_id: {
-//       type: DataTypes.INTEGER,
-//       primaryKey: true,
-//       autoIncrement: true,
-//     },
-//     user1_id: {
-//       type: DataTypes.INTEGER,
-//       allowNull: true,
-//     },
-//     user2_id: {
-//       type: DataTypes.INTEGER,
-//       allowNull: true,
-//     },
-//   },
-//   {
-//     tableName: "conversations",
-//     timestamps: true,
-//   }
-// );
-
-// export default Conversation;
-
-
 import { DataTypes } from "sequelize";
 import sequelize from "../lib/db.js";
 
@@ -40,11 +11,10 @@ const Conversation = sequelize.define(
     },
 
     type: {
-      type: DataTypes.ENUM("private", "group"),
+      type: DataTypes.ENUM("private", "group","broadcast"),
       allowNull: false,
     },
 
-    // ONLY private chat
     user1_id: {
       type: DataTypes.INTEGER,
       allowNull: true,

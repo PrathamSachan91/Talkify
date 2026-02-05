@@ -9,7 +9,7 @@ export const fetchUsers = async () => {
 
 /* Get or create conversation */
 export const getConversation = async (userId) => {
-  const res = await api.post("/chat/conversation", { userId });
+  const res = await api.post("/chat/getconversation", { userId });
   return res.data;
 };
 
@@ -36,7 +36,7 @@ export const sendMessage = async ({ conversationId, text, images }) => {
 
 /* Fetch conversation meta */
 export const fetchConversationMeta = async (conversationId) => {
-  const res = await api.get(`/chat/conversation/${conversationId}`);
+  const res = await api.get(`/chat/getmeta/${conversationId}`);
   return res.data;
 };
 
@@ -49,5 +49,15 @@ export const fetchUserById = async (userId) => {
 // Group routes
 export const fetchGroups = async () => {
   const res = await api.get("/groupList");
+  return res.data;
+};
+
+export const getGroup = async (payload) => {
+  const res = await api.post("/conversations/creategroup", payload);
+  return res.data;
+};
+
+export const fetchBroadcast = async () => {
+  const res = await api.get("/boardcastList");
   return res.data;
 };

@@ -1,4 +1,4 @@
-import { Conversation, ConversationMember } from "../models/index.js";
+import { Conversation, ConversationMember, Authentication } from "../models/index.js";
 
 export const createGroup = async (req, res) => {
   try {
@@ -9,21 +9,18 @@ export const createGroup = async (req, res) => {
       return res.status(400).json({ message: "Invalid data" });
     }
 
-    // 1️⃣ Create group conversation
     const conversation = await Conversation.create({
       type: "group",
       created_by: me,
       group_name,
     });
 
-    // 2️⃣ Add creator as admin
     await ConversationMember.create({
       conversation_id: conversation.conversation_id,
       user_id: me,
       role: "admin",
     });
 
-    // 3️⃣ Add other members
     const uniqueMembers = [...new Set(members)].filter((id) => id !== me);
 
     const bulk = uniqueMembers.map((id) => ({
@@ -45,4 +42,3 @@ export const createGroup = async (req, res) => {
     res.status(500).json({ message: "Failed to create group" });
   }
 };
-

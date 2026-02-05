@@ -99,13 +99,12 @@ const ChatDashboard = () => {
         >
           {convo?.type === "group"
             ? convo.group_name?.charAt(0)
-            : receiver?.user_name?.charAt(0) || "?"}
+            : receiver?.user_name?.charAt(0) || "P"}
         </div>
-
         <span>
-          {convo?.type === "group"
-            ? convo.group_name
-            : receiver?.user_name || "Chat"}
+          {convo?.type === "private"
+            ? receiver?.user_name || "Chat"
+            : convo?.group_name}
         </span>
       </div>
 
