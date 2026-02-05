@@ -28,6 +28,7 @@ const ChatDashboard = () => {
     queryFn: () => fetchConversationMeta(conversationId),
     enabled: !!conversationId,
   });
+  const showSenderName = convo?.type !== "private";
 
   const { data: receiver } = useQuery({
     queryKey: ["user", convo?.receiver_id],
@@ -126,8 +127,21 @@ const ChatDashboard = () => {
                 key={msg.id}
                 className={`flex ${isMe ? "justify-end" : "justify-start"}`}
               >
+                {showSenderName && !isMe && (
+                  <div
+                    className="w-7 h-7 ml-[-10px] mr-[5px] rounded-full flex items-center justify-center font-semibold"
+                    style={{
+                      backgroundColor: "var(--accent-secondary)",
+                      color: "#020617",
+                    }}
+                  >
+                    <p className="mx-[-7px] mt-[-5px] ">
+                      {msg.sender?.user_name.charAt(0)}
+                    </p>
+                  </div>
+                )}
                 <div
-                  className="inline-block max-w-[60%] px-4 py-2 rounded-lg text-sm break-words"
+                  className="relative inline-block max-w-[60%] px-4 py-2 rounded-lg text-sm break-words"
                   style={{
                     backgroundColor: isMe
                       ? "var(--accent-primary)"
@@ -135,6 +149,25 @@ const ChatDashboard = () => {
                     color: isMe ? "#020617" : "var(--text-main)",
                   }}
                 >
+                  {/* Arrow */}
+                  {showSenderName && !isMe && (
+                    <span
+                      className="absolute -top-[-4.7px] -left-2 w-0 h-0 
+                      border-l-8 border-l-transparent 
+                      border-r-8 border-r-transparent 
+                      border-b-8 -rotate-90"
+                      style={{
+                        borderBottomColor: "var(--bg-input)",
+                      }}
+                    />
+                  )}
+
+                  {showSenderName && !isMe && (
+                    <p className="mx-[-7px] mt-[-5px] text-[10px] text-white/80 font-semibold opacity-90">
+                      {msg.sender?.user_name}
+                    </p>
+                  )}
+
                   <div className="space-y-2">
                     {msg.images?.length > 0 && (
                       <div
@@ -151,14 +184,12 @@ const ChatDashboard = () => {
                           window.open(`/image.html?images=${query}`, "_blank");
                         }}
                       >
-                        {/* FIRST IMAGE */}
                         <img
                           src={`http://localhost:3001${msg.images[0]}`}
                           alt="sent"
                           className="max-w-60 max-h-60 object-contain rounded-lg"
                         />
 
-                        {/* OVERLAY IF MULTIPLE */}
                         {msg.images.length > 1 && (
                           <div className="absolute inset-0 bg-black/60 flex items-end justify-end rounded-lg px-2 py-1">
                             <span className="text-white text-xl font-semibold">

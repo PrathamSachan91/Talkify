@@ -1,5 +1,10 @@
 import { Op } from "sequelize";
-import { Conversation, Message, Authentication,ConversationMember } from "../models/index.js";
+import {
+  Conversation,
+  Message,
+  Authentication,
+  ConversationMember,
+} from "../models/index.js";
 import { getIO } from "../socket.js";
 
 /* ---------------- GET OR CREATE CONVERSATION ---------------- */
@@ -54,7 +59,7 @@ export const getMessages = async (req, res) => {
       }
     }
 
-    if (conversation.type === "group" || conversation.type==="boardcast") {
+    if (conversation.type === "group" || conversation.type === "boardcast") {
       const isMember = await ConversationMember.findOne({
         where: {
           conversation_id: conversationId,
@@ -70,6 +75,11 @@ export const getMessages = async (req, res) => {
     const messages = await Message.findAll({
       where: { conversation_id: conversationId },
       order: [["createdAt", "ASC"]],
+      include: {
+        model: Authentication,
+        as: "sender",
+        attributes: ["auth_id", "user_name"],
+      },
     });
 
     res.json(messages);
@@ -101,7 +111,7 @@ export const sendMessage = async (req, res) => {
       }
     }
 
-    if (conversation.type === "group" || conversation.type==="boardcast") {
+    if (conversation.type === "group" || conversation.type === "boardcast") {
       const isMember = await ConversationMember.findOne({
         where: {
           conversation_id: conversationId,
@@ -117,9 +127,7 @@ export const sendMessage = async (req, res) => {
     const cleanText = text?.trim() || null;
 
     const files = req.files || [];
-    const images = files.map(
-      (file) => `/uploads/chat/${file.filename}`
-    );
+    const images = files.map((file) => `/uploads/chat/${file.filename}`);
 
     if (!cleanText && images.length === 0) {
       return res.status(400).json({ message: "Empty message" });
@@ -137,10 +145,17 @@ export const sendMessage = async (req, res) => {
       type,
     });
 
+    const fullMessage = await Message.findByPk(message.id, {
+      include: {
+        model: Authentication,
+        as: "sender",
+        attributes: ["auth_id", "user_name"],
+      },
+    });
     const io = getIO();
     io.to(`conversation-${conversationId}`).emit(
       "receive_message",
-      message
+      fullMessage,
     );
 
     res.status(201).json(message);
