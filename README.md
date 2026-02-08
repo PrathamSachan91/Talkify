@@ -311,37 +311,37 @@ Beautiful landing page showcasing key features with modern glassmorphism design.
 ## 📸 Screenshots
 
 ### 🏠 Landing Page
-![Landing Page](screenshots/landing.png)
+![Landing Page](screenshot/landing.png)
 *Beautiful welcome screen with feature highlights and modern glassmorphism design*
 
 ---
 
 ### 🔐 Authentication
-![Login Screen](screenshots/login.png)
+![Login Screen](screenshot/login.png)
 *Secure login interface with email authentication and Google OAuth integration*
 
 ---
 
 ### 💬 Chat Dashboard
-![Chat Interface](screenshots/chat.png)
+![Chat Interface](screenshot/chat.png)
 *Real-time messaging with smooth animations, typing indicators, and message delivery status*
 
 ---
 
 ### 👥 Create Group
-![Create Group Modal](screenshots/creategroup.png)
+![Create Group Modal](screenshot/creategroup.png)
 *Easy group creation with member selection and intuitive UI*
 
 ---
 
 ### 👤 Edit Profile
-![Edit Profile Modal](screenshots/edit.png)
+![Edit Profile Modal](screenshot/edit.png)
 *Update profile information, change display name, and upload custom avatar*
 
 ---
 
 ### 🖼️ Image Gallery
-![Gallery View](screenshots/gallery.png)
+![Gallery View](screenshot/gallery.png)
 *Browse all shared images in a beautiful grid layout with search functionality and lightbox viewer*
 
 ---
