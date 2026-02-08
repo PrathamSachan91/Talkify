@@ -308,6 +308,44 @@ Beautiful landing page showcasing key features with modern glassmorphism design.
 
 ---
 
+## 📸 Screenshots
+
+### 🏠 Landing Page
+![Landing Page](screenshots/landing.png)
+*Beautiful welcome screen with feature highlights and modern glassmorphism design*
+
+---
+
+### 🔐 Authentication
+![Login Screen](screenshots/login.png)
+*Secure login interface with email authentication and Google OAuth integration*
+
+---
+
+### 💬 Chat Dashboard
+![Chat Interface](screenshots/chat.png)
+*Real-time messaging with smooth animations, typing indicators, and message delivery status*
+
+---
+
+### 👥 Create Group
+![Create Group Modal](screenshots/creategroup.png)
+*Easy group creation with member selection and intuitive UI*
+
+---
+
+### 👤 Edit Profile
+![Edit Profile Modal](screenshots/edit.png)
+*Update profile information, change display name, and upload custom avatar*
+
+---
+
+### 🖼️ Image Gallery
+![Gallery View](screenshots/gallery.png)
+*Browse all shared images in a beautiful grid layout with search functionality and lightbox viewer*
+
+---
+
 ## 📁 Project Structure
 
 ```
@@ -513,64 +551,24 @@ of this software and associated documentation files (the "Software")...
 
 **Pratham Sachan**
 
-- 🌐 Portfolio: [yourwebsite.com](https://yourwebsite.com)
-- 💼 LinkedIn: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
-- 🐙 GitHub: [@yourusername](https://github.com/yourusername)
-- 📧 Email: your.email@example.com
-- 🐦 Twitter: [@yourhandle](https://twitter.com/yourhandle)
+- 💼 LinkedIn: [linkedin.com/in/yourprofile](https://www.linkedin.com/in/prathamsachan8756924/))
+- 🐙 GitHub: [@yourusername](https://github.com/PrathamSachan91)
+- 📧 Email: prathamsachan6886@gmail.com
 
 ---
 
-## 🙏 Acknowledgments
-
-Special thanks to:
-- **Lucide** for the beautiful icon set
-- **Socket.io** for real-time communication
-- **React Query** for excellent data synchronization
-- **Tailwind CSS** for utility-first styling
-- The open-source community for inspiration and support
-
----
-
-## 📞 Support & Community
-
-Need help or want to connect?
-
-- 📖 **Documentation:** [docs.talkify.com](https://docs.talkify.com)
-- 💬 **Discord:** Join our community server
-- 🐛 **Issues:** Report bugs on GitHub
-- 💡 **Discussions:** Share ideas on GitHub Discussions
-- 📧 **Email:** support@talkify.com
-
----
-
-## 🔒 Security
-
-Found a security vulnerability? Please email security@talkify.com instead of opening a public issue.
-
----
 
 ## 📊 Project Stats
 
-![GitHub stars](https://img.shields.io/github/stars/yourusername/talkify?style=social)
-![GitHub forks](https://img.shields.io/github/forks/yourusername/talkify?style=social)
-![GitHub issues](https://img.shields.io/github/issues/yourusername/talkify)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/yourusername/talkify)
-![GitHub last commit](https://img.shields.io/github/last-commit/yourusername/talkify)
+### 🔐 Authentication
+![Login](screenshots/login.png)
+
+### 📊 Dashboard
+![Dashboard](screenshots/dashboard.png)
+![Dashboard](screenshots/chat.png)
+![Dashboard](screenshots/creategroup)
+![Dashboard](screenshots/edit)
+![Dashboard](screenshots/gallery.png)
+![Dashboard](screenshots/landing.png)
 
 ---
-
-<div align="center">
-
-### ⭐ If you found this project helpful, please star it!
-
-**Built with ❤️ by Pratham Sachan**
-
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
-![Maintained](https://img.shields.io/badge/maintained-yes-green.svg)
-
-**[⬆ back to top](#-talkify---real-time-chat-application)**
-
-</div>
