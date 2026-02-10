@@ -323,7 +323,7 @@ Beautiful landing page showcasing key features with modern glassmorphism design.
 ---
 
 ### 💬 Chat Dashboard
-![Chat Interface](screenshot/chat.png)
+![Chat Interface](https://github.dev/PrathamSachan91/Talkify_frontend/blob/main/screenshot/chat.png)
 *Real-time messaging with smooth animations, typing indicators, and message delivery status*
 
 ---
