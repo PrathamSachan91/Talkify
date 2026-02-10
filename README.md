@@ -311,7 +311,7 @@ Beautiful landing page showcasing key features with modern glassmorphism design.
 ## 📸 Screenshots
 
 ### 🏠 Landing Page
-![Landing Page](https://drive.google.com/file/d/1bXJS-Y4lmL0h15cwe5ds5IjM997LhwK6/view?usp=drive_link)
+![Landing Page](https://drive.google.com/uc?export=view&id=1bXJS-Y4lmL0h15cwe5ds5IjM997LhwK6)
 *Beautiful welcome screen with feature highlights and modern glassmorphism design*
 
 ---
