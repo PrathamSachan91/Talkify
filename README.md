@@ -546,8 +546,8 @@ of this software and associated documentation files (the "Software")...
 
 **Pratham Sachan**
 
-- 💼 LinkedIn: [linkedin.com/in/yourprofile](https://www.linkedin.com/in/prathamsachan8756924/))
-- 🐙 GitHub: [@yourusername](https://github.com/PrathamSachan91)
+- 💼 LinkedIn: [linkedin.com/in/prathamsachan8756924](https://www.linkedin.com/in/prathamsachan8756924/)
+- 🐙 GitHub: [@PrathamSachan91](https://github.com/PrathamSachan91)
 - 📧 Email: prathamsachan6886@gmail.com
 
 ---
