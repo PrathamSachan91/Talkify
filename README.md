@@ -317,27 +317,27 @@ Beautiful landing page showcasing key features with modern glassmorphism design.
 ---
 
 ### 🔐 Authentication
-![Login Screen](screenshot/login.png)
+![Login Screen](https://drive.google.com/uc?export=view&id=1Yql4z4fCUIsedYWoX_Y8I37sSpq3i53R)
 *Secure login interface with email authentication and Google OAuth integration*
 
 ---
 
-
 ### 👥 Create Group
-![Create Group Modal](screenshot/creategroup.png)
+![Create Group Modal](https://drive.google.com/uc?export=view&id=1y94JHyyLKYSxVIunbDRehjeqosYt0YmS)
 *Easy group creation with member selection and intuitive UI*
+
 
 ---
 
 ### 👤 Edit Profile
-![Edit Profile Modal](screenshot/edit.png)
-*Update profile information, change display name, and upload custom avatar*
+![Edit Profile Modal](https://drive.google.com/uc?export=view&id=1j3_cWhcQ_xHiPS-BI5BiyFeEAq-Mg2-z)
+*Update profile information, change display name, and upload custom avatar
 
 ---
-
 ### 🖼️ Image Gallery
-![Gallery View](screenshot/gallery.png)
+![Gallery View](https://drive.google.com/uc?export=view&id=173w0FB4TK4-tittISPC7hksK5h8VvKt9)
 *Browse all shared images in a beautiful grid layout with search functionality and lightbox viewer*
+
 
 ---
 
@@ -556,14 +556,13 @@ of this software and associated documentation files (the "Software")...
 ## 📊 Project Stats
 
 ### 🔐 Authentication
-![Login](screenshots/login.png)
+![Login](https://drive.google.com/uc?export=view&id=1Yql4z4fCUIsedYWoX_Y8I37sSpq3i53R)
 
 ### 📊 Dashboard
-![Dashboard](screenshots/dashboard.png)
-![Dashboard](screenshots/chat.png)
-![Dashboard](screenshots/creategroup)
-![Dashboard](screenshots/edit)
-![Dashboard](screenshots/gallery.png)
-![Dashboard](screenshots/landing.png)
+![Dashboard](https://drive.google.com/uc?export=view&id=1eACN8NWHSmDLp-PVkvwARYw4wrCvGbrF)
+![Dashboard](https://drive.google.com/uc?export=view&id=1y94JHyyLKYSxVIunbDRehjeqosYt0YmS)
+![Dashboard](https://drive.google.com/uc?export=view&id=1j3_cWhcQ_xHiPS-BI5BiyFeEAq-Mg2-z)
+![Dashboard](https://drive.google.com/uc?export=view&id=173w0FB4TK4-tittISPC7hksK5h8VvKt9)
+![Dashboard](https://drive.google.com/uc?export=view&id=1bXJS-Y4lmL0h15cwe5ds5IjM997LhwK6)
 
 ---
